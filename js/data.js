@@ -1,8 +1,3 @@
-/*
- * INDEF — Plataforma Comercial
- * Todos los datos corresponden al negocio actual.
- * Campos marcados [POR CONFIRMAR] requieren validación antes del lanzamiento.
- */
 
 const siteConfig = {
   brandName: "INDEF",
@@ -630,7 +625,6 @@ const participationData = {
     },
     {
       title: "Horizonte de tiempo y liquidez",
-      /* [POR CONFIRMAR] Confirmar horizonte mínimo y condiciones de salida con el equipo legal */
       text: "Esta es una participación de largo plazo. El capital no es líquido en el corto plazo. El horizonte de participación y las condiciones de salida están definidos en el contrato y se revisan en la primera sesión."
     },
     {
@@ -670,7 +664,6 @@ const faqData = {
     },
     {
       question: "¿Cuánto tiempo queda comprometido mi capital?",
-      /* [POR CONFIRMAR] Confirmar horizonte mínimo con el equipo legal antes del lanzamiento */
       answer: "Esta es una participación de largo plazo. El capital no es líquido en el corto plazo. El horizonte de participación y las condiciones de salida están definidos en el contrato. Los términos exactos se revisan en la primera sesión y están documentados antes de firmar cualquier documento."
     },
     {
@@ -702,9 +695,7 @@ const blogData = {
   ]
 };
 
-/* ─── CTA FINAL ──────────────────────────────────────────────
-   El visitante que llega aquí ya recorrió todo el sitio.
-─────────────────────────────────────────────────────────── */
+/* ─── CTA FINAL ──────────────────────────────────────────────────────────── */
 const ctaData = {
   title: "¿Listo para una conversación?",
   subtitle: "No una presentación. No una propuesta. Una sesión de 30 a 45 minutos para resolver las preguntas que importan antes de tomar cualquier decisión.",

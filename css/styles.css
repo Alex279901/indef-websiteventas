@@ -2839,12 +2839,12 @@ button {
     aspect-ratio: 4 / 3;
   }
 
-  /* ── Upcoming img card */
+  /* ── Upcoming img card: imagen vertical — mostrar completa sin recorte */
   .upcoming-img-frame img {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: auto;
     width: 100%;
-    object-fit: cover;
-    object-position: center;
+    height: auto;
+    object-fit: contain;
   }
 }
 
@@ -3656,9 +3656,10 @@ body.lightbox-open {
   background: #fafafa;
 }
 
-/* Cards en dark sections ya tienen fondo oscuro — no alternar */
+/* Cards en dark sections — no aplicar fondo claro, usar fondo oscuro sutil */
 .section-dark .model-grid .model-card:nth-child(even),
-.section-dark .data-grid .data-card:nth-child(even) {
+.section-dark .data-grid .data-card:nth-child(even),
+.section-dark .new-location-cards .new-location-card:nth-child(even) {
   background: rgba(255, 255, 255, 0.05);
 }
 

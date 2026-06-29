@@ -1,0 +1,21 @@
+{
+  "name": "INDEF",
+  "short_name": "INDEF",
+  "description": "Identificamos, desarrollamos y operamos marcas gastronómicas internacionales.",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#080808",
+  "theme_color": "#080808",
+  "icons": [
+    {
+      "src": "/assets/logos/favicon-32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/logos/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

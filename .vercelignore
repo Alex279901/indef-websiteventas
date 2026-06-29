@@ -1,0 +1,5 @@
+# Archivos que no deben incluirse en el deploy público
+scripts/
+README.md
+assets/videos/originals/
+.gitignore

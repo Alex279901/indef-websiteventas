@@ -1,10 +1,7 @@
 (function () {
   const data = window.LANDING_DATA;
 
-  if (!data) {
-    console.error("LANDING_DATA no está disponible. Verifica que js/data.js cargue antes que js/main.js.");
-    return;
-  }
+  if (!data) return;
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
