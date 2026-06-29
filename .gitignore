@@ -1,0 +1,75 @@
+# ── macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+.AppleDouble
+.LSOverride
+Icon
+
+# ── Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# ── Linux
+*~
+
+# ── Editors
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# ── Node (si se agrega tooling)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+package-lock.json
+yarn.lock
+.npm
+
+# ── Build output
+dist/
+build/
+.cache/
+.parcel-cache/
+.turbo/
+
+# ── Environment
+.env
+.env.local
+.env.*.local
+
+# ── Logs
+*.log
+logs/
+
+# ── Archives / temp
+*.zip
+*.tar.gz
+*.rar
+*.7z
+*.tmp
+*.temp
+
+# ── Videos originales sin optimizar
+# Los videos optimizados para web viven en assets/videos/web/
+# Los originales se mantienen SOLO en local, no en el repo
+assets/videos/originals/
+
+# ── Archivos grandes sin referenciar (respaldo local)
+# Descomenta si decides no versionar los videos directamente:
+# assets/videos/*.mp4
+
+# ── Vercel
+.vercel
+
+# ── Misc
+*.pem
+.history/
