@@ -1,7 +1,19 @@
 (function () {
-  const data = window.LANDING_DATA;
+  const ALL_DATA = window.LANDING_DATA;
+  if (!ALL_DATA || !ALL_DATA.es) return;
 
-  if (!data) return;
+  const LANGS = ["es", "en", "fr"];
+
+  function detectLang() {
+    const saved = localStorage.getItem("indef-lang");
+    if (saved && LANGS.includes(saved)) return saved;
+    const navLangs = Array.from(navigator.languages || [navigator.language || "es"]);
+    const match = navLangs.map(l => l.split("-")[0].toLowerCase()).find(l => LANGS.includes(l));
+    return match || "es";
+  }
+
+  let activeLang = detectLang();
+  let data = ALL_DATA[activeLang];
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
@@ -77,13 +89,9 @@
     const brandName = $("[data-brand-name]");
     const desktopNav = $("[data-desktop-nav]");
     const mobileNav = $("[data-mobile-nav]");
-    const languageButton = $("[data-language-button]");
+    const switcher = $("[data-lang-switcher]");
     const storeButtons = $("[data-store-buttons]");
     const headerCta = $("[data-header-cta]");
-
-    /* Título desde index.html — no sobreescribir */
-    const meta = document.querySelector('meta[name="description"]');
-    if (meta) meta.setAttribute("content", data.heroData.description);
 
     brandName.textContent = siteConfig.brandName;
     brandMark.classList.add("is-placeholder");
@@ -109,7 +117,34 @@
       ${button(siteConfig.primaryCta, "mobile-menu-cta")}
     `;
 
-    languageButton.innerHTML = `<span>${escapeHTML(siteConfig.languageLabel)}</span>`;
+    if (switcher) {
+      const LANG_META = {
+        es: { flag: "🇲🇽", label: "Español", code: "ES" },
+        en: { flag: "🇺🇸", label: "English", code: "EN" },
+        fr: { flag: "🇫🇷", label: "Français", code: "FR" }
+      };
+      switcher.innerHTML = `
+        <button class="lang-trigger" data-lang-trigger
+                aria-haspopup="listbox" aria-expanded="false"
+                aria-label="${escapeAttr(data.siteConfig.ui.langLabel)}">
+          <span class="lang-current">${escapeHTML(LANG_META[activeLang].code)}</span>
+          <svg class="lang-chevron" width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="2,3.5 5,6.5 8,3.5"/>
+          </svg>
+        </button>
+        <div class="lang-dropdown" role="listbox" aria-label="${escapeAttr(data.siteConfig.ui.langLabel)}">
+          ${LANGS.map(code => `
+            <button class="lang-option${code === activeLang ? " is-active" : ""}"
+                    data-lang-option="${code}"
+                    role="option"
+                    aria-selected="${code === activeLang}">
+              <span class="lang-flag" aria-hidden="true">${LANG_META[code].flag}</span>
+              <span>${LANG_META[code].label}</span>
+            </button>
+          `).join("")}
+        </div>
+      `;
+    }
 
     if (storeButtons) storeButtons.innerHTML = "";
 
@@ -165,11 +200,11 @@
           </div>
         </article>
         <div class="promo-visual-video reveal-item">
-          <div class="promo-video-frame" data-promo-open role="button" tabindex="0" aria-label="Ver video en pantalla completa">
+          <div class="promo-video-frame" data-promo-open role="button" tabindex="0" aria-label="${escapeAttr(data.siteConfig.ui.openVideo)}">
             <video class="promo-video-el" autoplay muted loop playsinline preload="auto">
               <source src="assets/videos/VIDEO-BETY-02-5.mp4" type="video/mp4">
             </video>
-            <button class="promo-mute-btn" data-promo-mute aria-label="Activar sonido">
+            <button class="promo-mute-btn" data-promo-mute aria-label="${escapeAttr(data.siteConfig.ui.enableSound)}">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon-muted>
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                 <line x1="23" y1="9" x2="17" y2="15"/>
@@ -205,7 +240,7 @@
                   <article class="investor-card card-hover">
                     <span class="avatar">${escapeHTML(item.initials)}</span>
                     <h3>${escapeHTML(item.name)}</h3>
-                    <p class="investor-meta">Participando en ${escapeHTML(item.branch)}</p>
+                    <p class="investor-meta">${escapeHTML(data.siteConfig.ui.participatingIn)} ${escapeHTML(item.branch)}</p>
                     <strong class="investor-amount">${escapeHTML(item.amount)}</strong>
                     <p class="investor-meta">${escapeHTML(item.time)}</p>
                   </article>
@@ -251,13 +286,13 @@
                  data-selection-video-open
                  role="button"
                  tabindex="0"
-                 aria-label="Ver video en pantalla completa">
+                 aria-label="${escapeAttr(data.siteConfig.ui.openVideo)}">
               <video class="selection-video-el"
                      autoplay muted loop playsinline preload="auto"
                      data-selection-bg>
                 <source src="${VIDEO_SRC}" type="video/mp4">
               </video>
-              <button class="promo-mute-btn" data-selection-mute aria-label="Activar sonido">
+              <button class="promo-mute-btn" data-selection-mute aria-label="${escapeAttr(data.siteConfig.ui.enableSound)}">
                 <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon-muted>
                   <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                   <line x1="23" y1="9" x2="17" y2="15"/>
@@ -380,13 +415,13 @@
                data-vision-video-open
                role="button"
                tabindex="0"
-               aria-label="Ver video en pantalla completa">
+               aria-label="${escapeAttr(data.siteConfig.ui.openVideo)}">
             <video class="founder-video-el"
                    autoplay muted loop playsinline preload="auto"
                    data-vision-bg>
               <source src="${"assets/videos/QUE ES INDEF.mp4".replace(/ /g, "%20")}" type="video/mp4">
             </video>
-            <button class="promo-mute-btn" data-vision-mute aria-label="Activar sonido">
+            <button class="promo-mute-btn" data-vision-mute aria-label="${escapeAttr(data.siteConfig.ui.enableSound)}">
               <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" data-icon-muted>
                 <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
                 <line x1="23" y1="9" x2="17" y2="15"/>
@@ -543,7 +578,7 @@
                   <div class="portfolio-card-body">
                     <div class="portfolio-card-meta">
                       <span class="portfolio-category">${escapeHTML(pillar.category)}</span>
-                      ${pillar.totalUnits > 0 ? `<span class="portfolio-unit-count">${pillar.totalUnits} unidades</span>` : ""}
+                      ${pillar.totalUnits > 0 ? `<span class="portfolio-unit-count">${pillar.totalUnits} ${escapeHTML(data.siteConfig.ui.units)}</span>` : ""}
                     </div>
                     <h3>${escapeHTML(pillar.title)}</h3>
                     <p class="muted">${escapeHTML(pillar.text)}</p>
@@ -559,7 +594,7 @@
         <div class="roi-panel" style="margin-top: 48px;">
           <div class="roi-panel-header">
             <span>${escapeHTML(model.roiTitle)}</span>
-            <span class="eyebrow-inline">Proyección anual ilustrativa</span>
+            <span class="eyebrow-inline">${escapeHTML(data.siteConfig.ui.annualProjection)}</span>
           </div>
           <div class="metrics-grid" style="padding: 24px;">
             ${model.roi.map((item, i) => `<div class="metric-card reveal-item"${staggerDelay(i)}><strong>${escapeHTML(item.value)}</strong><span>${escapeHTML(item.label)}</span></div>`).join("")}
@@ -625,7 +660,7 @@
           ${branches.videoGallery.map((v, i) => `
             <div class="bvg-item" data-bvg="${i}">
               <video class="bvg-video" src="${escapeAttr(v.src)}" preload="metadata" playsinline></video>
-              <button class="bvg-play" aria-label="Reproducir ${escapeAttr(v.label)}" data-bvg-play="${i}">
+              <button class="bvg-play" aria-label="${escapeAttr(data.siteConfig.ui.playVideo)} ${escapeAttr(v.label)}" data-bvg-play="${i}">
                 <svg viewBox="0 0 24 24" fill="currentColor" width="22" height="22" aria-hidden="true">
                   <path d="M8 5.14v14l11-7-11-7z"/>
                 </svg>
@@ -636,11 +671,11 @@
         </div>
 
         <div class="branches-summary-bar">
-          <span class="branches-stat"><strong>${branches.totalActive}</strong> unidades activas</span>
+          <span class="branches-stat"><strong>${branches.totalActive}</strong> ${escapeHTML(data.siteConfig.ui.activeUnits)}</span>
           <span class="branches-stat-div">·</span>
-          <span class="branches-stat">${branches.countries.length} países</span>
+          <span class="branches-stat">${branches.countries.length} ${escapeHTML(data.siteConfig.ui.countries)}</span>
           <span class="branches-stat-div">·</span>
-          <span class="branches-stat">Verificables en Google Maps</span>
+          <span class="branches-stat">${escapeHTML(data.siteConfig.ui.verifyOnMaps)}</span>
         </div>
 
         <div class="countries-wrapper">
@@ -649,7 +684,7 @@
               <div class="country-header">
                 <span class="country-flag">${escapeHTML(country.flag)}</span>
                 <h3 class="country-name">${escapeHTML(country.name)}</h3>
-                <span class="country-unit-count">${country.totalUnits} unidades</span>
+                <span class="country-unit-count">${country.totalUnits} ${escapeHTML(data.siteConfig.ui.units)}</span>
               </div>
               <div class="cities-grid">
                 ${country.cities.map(city => `
@@ -657,7 +692,7 @@
                     <div class="city-card-header image-placeholder"${bgStyle(city.image)}>
                       <div class="city-card-overlay">
                         <span class="city-card-name">${escapeHTML(city.name)}</span>
-                        <span class="city-card-count">${city.units} ${city.units === 1 ? "unidad" : "unidades"}</span>
+                        <span class="city-card-count">${city.units} ${city.units === 1 ? escapeHTML(data.siteConfig.ui.unit) : escapeHTML(data.siteConfig.ui.units)}</span>
                       </div>
                     </div>
                     <div class="branch-list-elegant">
@@ -754,13 +789,13 @@
               (post, i) => `
                 <article class="blog-card reveal-item"${staggerDelay(i)}>
                   <div class="blog-image blog-coming-soon">
-                    <span class="blog-cs-num">ARTÍCULO ${escapeHTML(post.num)}</span>
-                    <span class="blog-cs-label">Próximamente</span>
+                    <span class="blog-cs-num">${escapeHTML(data.siteConfig.ui.articleLabel)} ${escapeHTML(post.num)}</span>
+                    <span class="blog-cs-label">${escapeHTML(data.siteConfig.ui.comingSoon)}</span>
                   </div>
                   <div class="blog-body">
                     <div class="blog-meta">${escapeHTML(post.author)} · ${escapeHTML(post.date)}</div>
                     <h3>${escapeHTML(post.title)}</h3>
-                    <span class="blog-pending">· Próximamente</span>
+                    <span class="blog-pending">· ${escapeHTML(data.siteConfig.ui.comingSoon)}</span>
                   </div>
                 </article>
               `
@@ -942,7 +977,7 @@
       isOpen = false;
       hamburger.classList.remove("is-open");
       hamburger.setAttribute("aria-expanded", "false");
-      hamburger.setAttribute("aria-label", "Abrir menú");
+      hamburger.setAttribute("aria-label", data.siteConfig.ui.openMenu);
       menu.classList.remove("is-open");
       menu.setAttribute("aria-hidden", "true");
       header.classList.remove("menu-active");
@@ -955,7 +990,7 @@
       isOpen = true;
       hamburger.classList.add("is-open");
       hamburger.setAttribute("aria-expanded", "true");
-      hamburger.setAttribute("aria-label", "Cerrar menú");
+      hamburger.setAttribute("aria-label", data.siteConfig.ui.closeMenu);
       menu.classList.add("is-open");
       menu.setAttribute("aria-hidden", "false");
       header.classList.add("menu-active");
@@ -1126,7 +1161,7 @@
             <div class="scenario-card">
               <span>${escapeHTML(scenario.name)}</span>
               <strong>${money(projected)}</strong>
-              <span>${scenario.annualRoi}% ROI anual · +${money(gain)}</span>
+              <span>${scenario.annualRoi}% ${escapeHTML(data.siteConfig.ui.roiSuffix)} · +${money(gain)}</span>
             </div>
           `;
         })
@@ -1186,11 +1221,75 @@
     });
   }
 
-  function init() {
-    renderAll();
-    setupStickyHeader();
-    setupMobileMenu();
-    setupSmoothScroll();
+  function updateSEO() {
+    const seo = data.seoData;
+    document.documentElement.lang = activeLang;
+    document.title = seo.title;
+    const setMeta = (sel, attr, val) => {
+      const el = document.querySelector(sel);
+      if (el) el.setAttribute(attr, val);
+    };
+    setMeta('meta[name="description"]', "content", seo.description);
+    setMeta('meta[property="og:title"]', "content", seo.ogTitle);
+    setMeta('meta[property="og:description"]', "content", seo.ogDescription);
+    setMeta('meta[name="twitter:title"]', "content", seo.ogTitle);
+    setMeta('meta[name="twitter:description"]', "content", seo.ogDescription);
+  }
+
+  function setupLangSwitcher() {
+    document.addEventListener("click", (e) => {
+      const trigger = e.target.closest("[data-lang-trigger]");
+      const option = e.target.closest("[data-lang-option]");
+      const switcher = e.target.closest("[data-lang-switcher]");
+
+      if (trigger) {
+        const sw = trigger.closest("[data-lang-switcher]");
+        const isOpen = sw.classList.toggle("is-open");
+        trigger.setAttribute("aria-expanded", String(isOpen));
+        return;
+      }
+
+      if (option) {
+        const lang = option.dataset.langOption;
+        const sw = option.closest("[data-lang-switcher]");
+        if (sw) {
+          sw.classList.remove("is-open");
+          const t = $("[data-lang-trigger]", sw);
+          if (t) t.setAttribute("aria-expanded", "false");
+        }
+        if (lang && LANGS.includes(lang) && lang !== activeLang) {
+          activeLang = lang;
+          data = ALL_DATA[lang];
+          localStorage.setItem("indef-lang", lang);
+          updateSEO();
+          renderAll();
+          setupAfterRender();
+        }
+        return;
+      }
+
+      if (!switcher) {
+        $$("[data-lang-switcher].is-open").forEach((sw) => {
+          sw.classList.remove("is-open");
+          const t = $("[data-lang-trigger]", sw);
+          if (t) t.setAttribute("aria-expanded", "false");
+        });
+      }
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        $$("[data-lang-switcher].is-open").forEach((sw) => {
+          sw.classList.remove("is-open");
+          const t = $("[data-lang-trigger]", sw);
+          if (t) t.setAttribute("aria-expanded", "false");
+        });
+      }
+    });
+  }
+
+  function setupAfterRender() {
+    $$(".promo-lightbox").forEach((m) => m.remove());
     setupReveal();
     setupActiveNav();
     setupCarousel();
@@ -1208,6 +1307,16 @@
     setupTripleCarousel();
   }
 
+  function init() {
+    renderAll();
+    updateSEO();
+    setupStickyHeader();
+    setupMobileMenu();
+    setupSmoothScroll();
+    setupLangSwitcher();
+    setupAfterRender();
+  }
+
   function setupPromoLightbox() {
     const trigger = $("[data-promo-open]");
     if (!trigger) return;
@@ -1217,11 +1326,11 @@
     modal.className = "promo-lightbox";
     modal.setAttribute("role", "dialog");
     modal.setAttribute("aria-modal", "true");
-    modal.setAttribute("aria-label", "Video en pantalla completa");
+    modal.setAttribute("aria-label", data.siteConfig.ui.openVideo);
     modal.innerHTML = `
       <div class="promo-lightbox-backdrop" data-lightbox-close></div>
       <div class="promo-lightbox-shell">
-        <button class="promo-lightbox-close" data-lightbox-close aria-label="Cerrar">
+        <button class="promo-lightbox-close" data-lightbox-close aria-label="${escapeAttr(data.siteConfig.ui.close)}">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"/>
             <line x1="6" y1="6" x2="18" y2="18"/>
@@ -1255,7 +1364,7 @@
       if (muteBtn) {
         $("[data-icon-muted]", muteBtn).style.display = "";
         $("[data-icon-unmuted]", muteBtn).style.display = "none";
-        muteBtn.setAttribute("aria-label", "Activar sonido");
+        muteBtn.setAttribute("aria-label", data.siteConfig.ui.enableSound);
       }
     };
 
@@ -1292,7 +1401,7 @@
       const muted = video.muted;
       iconMuted.style.display = muted ? "" : "none";
       iconUnmuted.style.display = muted ? "none" : "";
-      btn.setAttribute("aria-label", muted ? "Activar sonido" : "Silenciar");
+      btn.setAttribute("aria-label", muted ? data.siteConfig.ui.enableSound : data.siteConfig.ui.mute);
     });
   }
 
@@ -1337,7 +1446,7 @@
     modal.innerHTML = `
       <div class="promo-lightbox-backdrop" data-vlb-close></div>
       <div class="promo-lightbox-shell">
-        <button class="promo-lightbox-close" data-vlb-close aria-label="Cerrar">
+        <button class="promo-lightbox-close" data-vlb-close aria-label="${escapeAttr(data.siteConfig.ui.close)}">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -1368,7 +1477,7 @@
       if (muteBtn) {
         $("[data-icon-muted]", muteBtn).style.display = "";
         $("[data-icon-unmuted]", muteBtn).style.display = "none";
-        muteBtn.setAttribute("aria-label", "Activar sonido");
+        muteBtn.setAttribute("aria-label", data.siteConfig.ui.enableSound);
       }
     };
 
@@ -1400,7 +1509,7 @@
       const muted = video.muted;
       iconMuted.style.display = muted ? "" : "none";
       iconUnmuted.style.display = muted ? "none" : "";
-      btn.setAttribute("aria-label", muted ? "Activar sonido" : "Silenciar");
+      btn.setAttribute("aria-label", muted ? data.siteConfig.ui.enableSound : data.siteConfig.ui.mute);
     });
   }
 
@@ -1416,7 +1525,7 @@
       const muted = video.muted;
       iconMuted.style.display = muted ? "" : "none";
       iconUnmuted.style.display = muted ? "none" : "";
-      btn.setAttribute("aria-label", muted ? "Activar sonido" : "Silenciar");
+      btn.setAttribute("aria-label", muted ? data.siteConfig.ui.enableSound : data.siteConfig.ui.mute);
     });
   }
 
@@ -1434,7 +1543,7 @@
     modal.innerHTML = `
       <div class="promo-lightbox-backdrop" data-slb-close></div>
       <div class="promo-lightbox-shell">
-        <button class="promo-lightbox-close" data-slb-close aria-label="Cerrar">
+        <button class="promo-lightbox-close" data-slb-close aria-label="${escapeAttr(data.siteConfig.ui.close)}">
           <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
           </svg>
@@ -1465,7 +1574,7 @@
       if (muteBtn) {
         $("[data-icon-muted]", muteBtn).style.display = "";
         $("[data-icon-unmuted]", muteBtn).style.display = "none";
-        muteBtn.setAttribute("aria-label", "Activar sonido");
+        muteBtn.setAttribute("aria-label", data.siteConfig.ui.enableSound);
       }
     };
 
